@@ -1,0 +1,2 @@
+RewriteEngin On
+RewriteRule . API.php
