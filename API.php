@@ -1,32 +1,23 @@
 <?php
 declare(strict_types=1);
 
+
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$parts = explode('/', $_SERVER['REQUEST_URI']);
+
 // ------------------------------------
 // 1) PSR-4 Autoloader for SmartKey\
 // ------------------------------------
 spl_autoload_register(function (string $class): void {
-    $prefix   = 'SmartKey\\';
-    $base_dir = __DIR__ . '/src/';
-
-    if (strncmp($prefix, $class, strlen($prefix)) !== 0) {
-        return;
-    }
-    $relative_class = substr($class, strlen($prefix));
-    $file           = $base_dir
-                    . str_replace('\\', '/', $relative_class)
-                    . '.php';
-    if (file_exists($file)) {
-        require $file;
-    }
+    require __DIR__ . '/src/' . $class . '.php';
+    
 });
 
-// ------------------------------------
-// 2) Routing Logic (endpoints in src/)
-// ------------------------------------
-header('Content-Type: application/json');
-
-// Full request path, e.g. /SmartKey/Backend/api/customers
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// --------- here we handle the errors;
+set_error_handler("ErrorHandler::handleError");
+// --------- here we handle exceptions;
+set_exception_handler("ErrorHandler::handleException");
+header("Content-Type: application/json; charset=UTF-8");
 
 // Find “/api/”
 $pos = strpos($uri, '/api/');
@@ -35,6 +26,7 @@ if ($pos === false) {
     echo json_encode(['error' => 'Invalid API path']);
     exit;
 }
+
 
 // Grab everything after “/api/”
 $endpoint = substr($uri, $pos + 5);
@@ -46,11 +38,64 @@ if ($endpoint === '') {
     exit;
 }
 
-// Now point to src/{endpoint}.php
-$target = __DIR__ . "/src/{$endpoint}.php";
-if (file_exists($target)) {
-    include $target;
-} else {
-    http_response_code(404);
-    echo json_encode(['error' => 'Endpoint not found']);
+// // Now point to src/{endpoint}.php
+// $target = __DIR__ . "/src/{$endpoint}.php";
+// if (file_exists($target)) {
+//     include $target;
+// } else {
+//     http_response_code(404);
+//     echo json_encode(['error' => 'Endpoint not found']);
+//     exit;
+// }
+
+
+
+$database = new Database(
+    host: 'localhost',
+    name: 'smart_key',
+    user: 'root',  
+    password: ''
+);
+
+// Check if the connection is successful
+$connection = $database->getConnection();
+if ($connection === null) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database connection failed']);
+    exit;
 }
+
+
+switch ($endpoint) {
+    case 'users':
+        UsersProcess($database,$parts);
+        break;
+    case 'customers':
+        CustomersProcess($database,$parts);
+        break;
+    default:
+        http_response_code(404);
+        echo json_encode(['error' => 'Invalid endpoint']);
+        exit;
+}   
+
+
+function CustomersProcess($database,$parts){
+    $gatway = new CustomersGatway($database);
+    $Customers = new Customers($gatway);
+    $Customers->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
+}
+
+function UsersProcess($database,$parts){
+    $gatway = new UsersGatway($database);
+    $Users = new Users($gatway);
+    $Users->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
+}
+
+// $UsersControl = new Users;
+// $UsersControl->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
+
+
+
+
+// var_dump($parts[4]);
