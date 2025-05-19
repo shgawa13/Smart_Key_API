@@ -70,9 +70,15 @@ switch ($endpoint) {
     case 'users':
         UsersProcess($database,$parts);
         break;
+
     case 'customers':
         CustomersProcess($database,$parts);
         break;
+
+    case 'vehicles':
+        VehiclesProcess($database,$parts);
+        break;
+
     default:
         http_response_code(404);
         echo json_encode(['error' => 'Invalid endpoint']);
@@ -90,6 +96,13 @@ function UsersProcess($database,$parts){
     $gatway = new UsersGatway($database);
     $Users = new Users($gatway);
     $Users->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
+}
+
+function VehiclesProcess($database,$parts){
+    $gatway = new VehiclesGatway($database);
+    $Vehicles = new Vehicles($gatway);
+    $Vehicles->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
+   
 }
 
 // $UsersControl = new Users;

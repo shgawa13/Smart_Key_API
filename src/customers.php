@@ -101,9 +101,9 @@ class Customers
 
     private function updateCustomer(array $current, array $data): void
     {
-        // 1. validate
+     // 1. validate
     $errors = $this->getValidationErrors($data);
-    if ($errors) {
+    if (!empty($errors)) {
         http_response_code(422);
         echo json_encode(['error' => 'Validation errors', 'details' => $errors]);
         return;

@@ -81,27 +81,27 @@ class UsersGatway
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function update(int $id, array $data): int
+    public function update(array $current, array $new): int
     {
       $rowsEffected = 0;
-       try{
+      try{
         $query = "UPDATE users SET UserName = :UserName, Password = :Password WHERE UserID = :id";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':UserName', $data['UserName'], PDO::PARAM_STR);
-        $stmt->bindParam(':Password', $data['Password'], PDO::PARAM_STR);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-
-        $rowsEffected = $stmt->execute();
-       }catch (PDOException $e) {
+        $stmt->bindValue(':UserName', $new['UserName'] ?? $current['UserName'], PDO::PARAM_STR);
+        $stmt->bindValue(':Password', $new['Password'] ?? $current['Password'], PDO::PARAM_STR);
+        $stmt->bindValue(':id', $current['UserID'], PDO::PARAM_INT);
+        $stmt->execute();
+        $rowsEffected = (int)$stmt->rowCount();
+      }
+      catch (PDOException $e) {
         // Handle the exception
         http_response_code(500);
         // Log the error message  
         json_decode("Error: " . $e->getMessage());
-        return false;
       }
       finally{
         return $rowsEffected;
-      } 
+      }
     }
 
     public function delete(int $id): bool
