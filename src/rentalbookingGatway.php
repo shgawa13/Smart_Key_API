@@ -83,9 +83,9 @@ class RentalbookingGatway
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
-                $isFound = true;
+                $IsFound = true;
             } else {
-                $isFound = false;
+                $IsFound = false;
             }
 
         } catch (PDOException $e) {
@@ -93,9 +93,8 @@ class RentalbookingGatway
         }
         finally
         {
-            return  $stmt->fetch(PDO::FETCH_ASSOC) ?: $isFound;
+            return  $stmt->fetch(PDO::FETCH_ASSOC) ?: $IsFound;
         }
-        
     }
 
     // update rental booking
@@ -115,21 +114,21 @@ class RentalbookingGatway
              PDO::PARAM_INT);
             $stmt->bindValue(':vehicleId', $new['VehicleID'] ?? $current['VehicleID'],
              PDO::PARAM_INT);
-            $stmt->bindParam(':rentalStartDate', $new['RentalStartDate'] ?? $current['RentalStartDate'],
+            $stmt->bindValue(':rentalStartDate', $new['RentalStartDate'] ?? $current['RentalStartDate'],
              PDO::PARAM_STR);
-            $stmt->bindParam(':rentalEndDate', $new['RentalEndDate'] ?? $current['RentalEndDate'],
+            $stmt->bindValue(':rentalEndDate', $new['RentalEndDate'] ?? $current['RentalEndDate'],
              PDO::PARAM_STR);
-            $stmt->bindParam(':pickupLocation', $new['PickupLocation'] ?? $current['PickupLocation'],
+            $stmt->bindValue(':pickupLocation', $new['PickupLocation'] ?? $current['PickupLocation'],
              PDO::PARAM_STR);
-            $stmt->bindParam(':dropoffLocation', $new['DropoffLocation'] ?? $current['DropoffLocation'],
+            $stmt->bindValue(':dropoffLocation', $new['DropoffLocation'] ?? $current['DropoffLocation'],
              PDO::PARAM_STR);
             $stmt->bindValue(':initialRentalDays', $new['InitialRentalDays'] ?? $current['InitialRentalDays'],
              PDO::PARAM_INT);
-            $stmt->bindParam(':rentalPricePerDay', $new['RentalPricePerDay'] ?? $current['RentalPricePerDay'],
+            $stmt->bindValue(':rentalPricePerDay', $new['RentalPricePerDay'] ?? $current['RentalPricePerDay'],
              PDO::PARAM_STR);
-            $stmt->bindParam(':initialTotalDueAmount', $new['InitialTotalDueAmount'] ?? $current['InitialTotalDueAmount'],
+            $stmt->bindValue(':initialTotalDueAmount', $new['InitialTotalDueAmount'] ?? $current['InitialTotalDueAmount'],
              PDO::PARAM_STR);
-            $stmt->bindParam(':initialCheckNotes', $new['InitialCheckNotes'] ?? $current['InitialCheckNotes'],
+            $stmt->bindValue(':initialCheckNotes', $new['InitialCheckNotes'] ?? $current['InitialCheckNotes'],
              PDO::PARAM_STR);
             $stmt->bindValue(':bookingId', $current['BookingID'] ?? $new['BookingID'],
              PDO::PARAM_INT);
