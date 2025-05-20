@@ -29,7 +29,7 @@ class VehiclesGatway
       $stmt->bindParam(':CarCategoryID', $data['CarCategoryID'], PDO::PARAM_INT);
       $stmt->bindParam(':RentalPricePerDay', $data['RentalPricePerDay'], PDO::PARAM_INT);
       $stmt->bindValue(':IsAvailableForRent',
-      isset($data['IsAvailableForRent']) ? (int)$data['IsAvailableForRent'] : 0,
+      isset($data['IsAvailableForRent']) ? (int)filter_var($data['IsAvailableForRent'], FILTER_VALIDATE_BOOLEAN) : 0,
       PDO::PARAM_INT);
       $stmt->bindParam(':CarImage', $data['CarImage'], PDO::PARAM_STR);
       $stmt->execute();
@@ -119,8 +119,9 @@ class VehiclesGatway
         PDO::PARAM_INT);
         $stmt->bindValue(':RentalPricePerDay', $data['RentalPricePerDay'] ?? $current['RentalPricePerDay'], 
           PDO::PARAM_INT);
-        $stmt->bindValue(':IsAvailableForRent', $data['IsAvailableForRent'] ?? $current['IsAvailableForRent'],
-          PDO::PARAM_INT);
+          $IsAvailableForRent = isset($new['IsAvailableForRent']) ? filter_var($new['IsAvailableForRent'],
+           FILTER_VALIDATE_BOOLEAN) : (bool)$current['Gender'];
+      $stmt->bindValue(':Gender', $IsAvailableForRent, PDO::PARAM_INT);
         $stmt->bindValue(':CarImage', $data['CarImage'] ?? $current['CarImage'],
         PDO::PARAM_STR);
         $stmt->bindValue(':id', $current['VehicleID'], PDO::PARAM_INT);

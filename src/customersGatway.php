@@ -31,9 +31,11 @@ class CustomersGatway
       $stmt->bindParam(':SecondName', $data['SecondName']);
       $stmt->bindParam(':LastName', $data['LastName']);
       $stmt->bindParam(':DateOfBirth', $data['DateOfBirth']);
-      $stmt->bindValue(':Gender',
-      isset($data['Gender']) ? (int)$data['Gender'] : 0,
-      PDO::PARAM_INT); 
+      $stmt->bindValue(
+        ':Gender',
+        isset($data['Gender']) ? (int)filter_var($data['Gender'], FILTER_VALIDATE_BOOLEAN) : 0,
+        PDO::PARAM_INT
+    );
       $stmt->bindParam(':PhoneNumber', $data['PhoneNumber']);
       $stmt->bindParam(':DriverLicenseNumber', $data['DriverLicenseNumber']);
       $stmt->execute();
@@ -142,8 +144,10 @@ class CustomersGatway
       PDO::PARAM_STR);
       $stmt->bindValue(':DateOfBirth', $new['DateOfBirth']?? $current['DateOfBirth'],
       PDO::PARAM_STR);
-      $stmt->bindValue(':Gender', $new['Gender'] ?? $current['Gender'],
-      PDO::PARAM_BOOL);
+
+      $gender = isset($new['Gender']) ? filter_var($new['Gender'], FILTER_VALIDATE_BOOLEAN) : (bool)$current['Gender'];
+      $stmt->bindValue(':Gender', $gender, PDO::PARAM_INT);
+
       $stmt->bindValue(':PhoneNumber', $new['PhoneNumber'] ?? $current['PhoneNumber'],
       PDO::PARAM_STR);
       $stmt->bindValue(':DriverLicenseNumber', $new['DriverLicenseNumber']?? $current['DriverLicenseNumber'],

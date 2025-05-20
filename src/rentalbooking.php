@@ -62,7 +62,16 @@ class RentalBooking{
             return;
         }
         
-        $this->gatway->addRentalBooking($data);
+       $id = $this->gatway->addRentalBooking($data);
+       if ($id === 0) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Failed to add new Booking']);
+        return;
+    };
+
+    http_response_code(201);
+    echo json_encode(['message' => 'Booking added successfully', 'id' => $id]);
+
     }
 
     // getRentalBooking
@@ -113,8 +122,15 @@ class RentalBooking{
     // deleteRentalBooking
     private function deleteRentalBooking(string $id): void
     {
-        $this->gatway->deleteRentalBooking($id);
+        $isDeleted = $this->gatway->deleteRentalBooking($id);
+        if (!$isDeleted) {
+            http_response_code(404);
+            echo json_encode(['error' => "Rental booking not found with ID: $id"]);
+            return;
+        }
+
         http_response_code(204);
+        echo json_encode(['message' => "Rental booking with ID: $id deleted successfully"]);
     }
     // getValidationErrors
     private function getValidationErrors(array $data): array
@@ -122,7 +138,6 @@ class RentalBooking{
       
         $errors = [];
         $requiredFields =  [
-            'BookingID',
             'CustomerID',
             'VehicleID',
             'RentalStartDate', 
