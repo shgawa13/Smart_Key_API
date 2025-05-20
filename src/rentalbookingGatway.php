@@ -73,24 +73,27 @@ class RentalbookingGatway
     }
     
     // get rental booking by ID
-    public function getRentalBookingById(int $id): array
+    public function getRentalBookingById(int $id): array | bool
     {
-        $data = [];
+        $IsFound = false;
         try {
             $query = "SELECT * FROM RentalBooking WHERE BookingID = :id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $id);
             $stmt->execute();
-            
-            if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $data = $row;
+
+            if ($stmt->rowCount() > 0) {
+                $isFound = true;
+            } else {
+                $isFound = false;
             }
+
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
         }
         finally
         {
-            return $data;
+            return  $stmt->fetch(PDO::FETCH_ASSOC) ?: $isFound;
         }
         
     }

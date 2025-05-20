@@ -32,7 +32,7 @@ class RentalBooking{
                 }
 
                 $current = $this->gatway->getRentalBookingById($id);
-
+             
                 if (!$current) {
                     http_response_code(404);
                     echo json_encode(['error' => "Rental booking not found with ID: $id"]);
@@ -133,7 +133,7 @@ class RentalBooking{
             'InitialTotalDueAmount'
         ];
 
-        
+
         foreach ($requiredFields as $field) {
             if (empty($data[$field])) {
                 $errors[] = "$field is required";
