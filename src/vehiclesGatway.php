@@ -15,9 +15,9 @@ class VehiclesGatway
 
     try{
       $query = "INSERT INTO Vehicle(Make, Model, Year, Mileage, FuelTypeID, 
-      PlateNumber, CarCategoryID, RentalPricePerDay, IsAvailableForRent)
+      PlateNumber, CarCategoryID, RentalPricePerDay, IsAvailableForRent,CarImage)
       VALUES (:Make, :Model, :Year, :Mileage, :FuelTypeID,
-      :PlateNumber, :CarCategoryID, :RentalPricePerDay, :IsAvailableForRent)";
+      :PlateNumber, :CarCategoryID, :RentalPricePerDay, :IsAvailableForRent,:CarImage)";
       // Prepare the statement
       $stmt = $this->conn->prepare($query);
       $stmt->bindParam(':Make', $data['Make'], PDO::PARAM_STR);
@@ -31,6 +31,7 @@ class VehiclesGatway
       $stmt->bindValue(':IsAvailableForRent',
       isset($data['IsAvailableForRent']) ? (int)$data['IsAvailableForRent'] : 0,
       PDO::PARAM_INT);
+      $stmt->bindParam(':CarImage', $data['CarImage'], PDO::PARAM_STR);
       $stmt->execute();
   
       // here we return the last inserted ID
@@ -95,7 +96,7 @@ class VehiclesGatway
   {
     $query = "UPDATE Vehicle SET Make = :Make, Model = :Model, Year = :Year, Mileage = :Mileage,
     FuelTypeID = :FuelTypeID, PlateNumber = :PlateNumber, CarCategoryID = :CarCategoryID,
-    RentalPricePerDay = :RentalPricePerDay, IsAvailableForRent = :IsAvailableForRent
+    RentalPricePerDay = :RentalPricePerDay, IsAvailableForRent = :IsAvailableForRent, CarImage = :CarImage
     WHERE VehicleID = :id";
 
       $rowsEffected = 0;
@@ -120,6 +121,8 @@ class VehiclesGatway
           PDO::PARAM_INT);
         $stmt->bindValue(':IsAvailableForRent', $data['IsAvailableForRent'] ?? $current['IsAvailableForRent'],
           PDO::PARAM_INT);
+        $stmt->bindValue(':CarImage', $data['CarImage'] ?? $current['CarImage'],
+        PDO::PARAM_STR);
         $stmt->bindValue(':id', $current['VehicleID'], PDO::PARAM_INT);
         $rowsEffected= $stmt->execute();
 

@@ -2,10 +2,7 @@
 
 class Customers
 {
-    public function __construct(private CustomersGatway $gatway)
-    {
-        
-    }
+    public function __construct(private CustomersGatway $gatway){}
 
     public function processRequest(string $request, ?string $id): void
     {
