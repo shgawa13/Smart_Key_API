@@ -121,9 +121,19 @@ class RentalBooking{
     {
       
         $errors = [];
-        $requiredFields = ['BookingID', 'CustomerID','VehicleID',
-                         'RentalStartDate', 'RentalEndDate', 'PickupLocation',
-                         'InitialRentalDays', 'RentalPricePerDay', 'InitialTotalDueAmount'];
+        $requiredFields =  [
+            'BookingID',
+            'CustomerID',
+            'VehicleID',
+            'RentalStartDate', 
+            'RentalEndDate', 
+            'PickupLocation',
+            'InitialRentalDays', 
+            'RentalPricePerDay', 
+            'InitialTotalDueAmount'
+        ];
+
+        
         foreach ($requiredFields as $field) {
             if (empty($data[$field])) {
                 $errors[] = "$field is required";
