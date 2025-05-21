@@ -10,9 +10,9 @@ class RentalBooking{
     {
         switch ($request) {
             case 'GET':
-                if ($id !=="") {           // ← id   → single
+                if ($id !=="") {          
                      $this->getRentalBooking($id);
-                } else {                     // ← no id → list
+                } else {                     
                     $this->getAllRentalBookings();
                 }
                 break; 

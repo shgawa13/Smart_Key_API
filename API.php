@@ -83,6 +83,14 @@ switch ($endpoint) {
         RentalBookingProcess($database,$parts);
         break;
 
+    case 'fueltype':
+        FuleTypeProcess($database,$parts);
+        break;
+
+    case 'vehiclecategories':
+        VehicleCategoriesProcess($database,$parts);
+        break;
+
     default:
         http_response_code(404);
         echo json_encode(['error' => 'Invalid endpoint']);
@@ -114,6 +122,19 @@ function RentalBookingProcess($database,$parts){
     $RentalBooking = new RentalBooking($gatway);
     $RentalBooking->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
 }
+
+function FuleTypeProcess($database,$parts){
+    $gatway = new FuelTypeGatway($database);
+    $FuelType = new FuelType($gatway);
+    $FuelType->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
+}
+
+function VehicleCategoriesProcess($database,$parts){
+    $gatway = new VehicleCategoriesGatway($database);
+    $VehicleCategories = new VehicleCategories($gatway);
+    $VehicleCategories->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
+}
+
 // $UsersControl = new Users;
 // $UsersControl->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
 
