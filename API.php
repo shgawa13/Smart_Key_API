@@ -91,6 +91,10 @@ switch ($endpoint) {
         VehicleCategoriesProcess($database,$parts);
         break;
 
+    case 'rentaltransaction':
+        RentalTransactionProcess($database,$parts);
+        break;
+
     default:
         http_response_code(404);
         echo json_encode(['error' => 'Invalid endpoint']);
@@ -135,6 +139,11 @@ function VehicleCategoriesProcess($database,$parts){
     $VehicleCategories->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
 }
 
+function RentalTransactionProcess($database,$parts){
+    $gatway = new RentaltransactionGatway($database);
+    $RentalTransaction = new RentalTransaction($gatway);
+    $RentalTransaction->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
+}
 // $UsersControl = new Users;
 // $UsersControl->processRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
 

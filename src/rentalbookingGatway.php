@@ -33,11 +33,10 @@ class RentalbookingGatway
             $stmt->bindParam(':rentalPricePerDay', $data['RentalPricePerDay']);
             $stmt->bindParam(':initialTotalDueAmount', $data['InitialTotalDueAmount']);
             $stmt->bindParam(':initialCheckNotes', $data['InitialCheckNotes']);
+            $stmt->execute();
 
-            if ($stmt->execute()) {
-                // here we return the last inserted ID
-                $BookingID = (int)$this->conn->lastInsertId();
-            }
+            $BookingID = (int)$this->conn->lastInsertId();
+            
             
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
