@@ -17,6 +17,8 @@ spl_autoload_register(function (string $class): void {
 set_error_handler("ErrorHandler::handleError");
 // --------- here we handle exceptions;
 set_exception_handler("ErrorHandler::handleException");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Content-Type: application/json; charset=UTF-8");
 
 // Find “/api/”
