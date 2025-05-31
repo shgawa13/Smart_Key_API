@@ -14,49 +14,58 @@ class CustomersGatway
    * @param array $data The customer data
    * @return int The ID of the newly added customer
    */
+    // here is the table
+  //   CREATE TABLE Customer (
+  //     CustomerID INT AUTO_INCREMENT PRIMARY KEY,
+  //     FirstName VARCHAR(50) NOT NULL,
+  //     SecondName VARCHAR(50) NOT NULL,
+  //     LastName VARCHAR(50) NOT NULL,
+  //     DateOfBirth DATETIME NOT NULL,
+  //     Gender TINYINT NOT NULL CHECK (Gender IN (0, 1)),
+  //     PhoneNumber VARCHAR(15) NOT NULL,
+  //     DriverLicenseNumber VARCHAR(50) NOT NULL UNIQUE
+  // );
+
+
   
    // Add a new customer to the database
-  public function addNew(array $data): int
-  {
-     $NewId = 0;
+   public function addNew(array $data): int
+   {
+       $NewId = 0;
 
-    try{
-      $query = "INSERT INTO customer(FirstName, SecondName,LastName,DateOfBirth,
-      Gender,PhoneNumber,DriverLicenseNumber)
-      VALUES (:FirstName, :SecondName, :LastName, :DateOfBirth,
-      :Gender, :PhoneNumber, :DriverLicenseNumber)";
-      // Prepare the statement
-      $stmt = $this->conn->prepare($query);
-      $stmt->bindParam(':FirstName', $data['FirstName']);
-      $stmt->bindParam(':SecondName', $data['SecondName']);
-      $stmt->bindParam(':LastName', $data['LastName']);
-      $stmt->bindParam(':DateOfBirth', $data['DateOfBirth']);
-      $stmt->bindValue(
-        ':Gender',
-        isset($data['Gender']) ? (int)filter_var($data['Gender'], FILTER_VALIDATE_BOOLEAN) : 0,
-        PDO::PARAM_INT
-    );
-      $stmt->bindParam(':PhoneNumber', $data['PhoneNumber']);
-      $stmt->bindParam(':DriverLicenseNumber', $data['DriverLicenseNumber']);
-      $stmt->execute();
-      // here we return the last inserted ID
-      $NewId = (int)$this->conn->lastInsertId();
-
-      }
-      catch (PDOException $e) {
-        // Handle the exception
-        http_response_code(500);
-        // Log the error message  
-       json_decode("Error: " . $e->getMessage());
-        $NewId = 0;
-      }
-      finally
-      {
-        return $NewId;
-      }
-      
-  }
-
+       var_dump($data['Gender']);
+   
+       try {
+           $query = "INSERT INTO customer(FirstName, SecondName, LastName, DateOfBirth, Gender, PhoneNumber, DriverLicenseNumber)
+                     VALUES (:FirstName, :SecondName, :LastName, :DateOfBirth, :Gender, :PhoneNumber, :DriverLicenseNumber)";
+           
+           // Prepare the statement
+           $stmt = $this->conn->prepare($query);
+           $stmt->bindParam(':FirstName', $data['FirstName']);
+           $stmt->bindParam(':SecondName', $data['SecondName']);
+           $stmt->bindParam(':LastName', $data['LastName']);
+           $dateOfBirth = DateTime::createFromFormat('Y-m-d', $data['DateOfBirth']);
+           $formattedDate = $dateOfBirth ? $dateOfBirth->format('Y-m-d') : null;
+           $stmt->bindParam(':DateOfBirth', $formattedDate);
+           $genderValue = filter_var($data['Gender'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+           $stmt->bindValue(':Gender', $genderValue, PDO::PARAM_INT);
+           $stmt->bindParam(':PhoneNumber', $data['PhoneNumber']);
+           $stmt->bindParam(':DriverLicenseNumber', $data['DriverLicenseNumber']);
+           $stmt->execute();
+   
+           // Return the last inserted ID
+           $NewId = (int)$this->conn->lastInsertId();
+       } 
+       catch (PDOException $e) {
+           // Handle the exception properly
+           http_response_code(500);
+           echo json_encode(["Error" => $e->getMessage()]);
+           $NewId = 0;
+       }
+   
+       return $NewId;
+   }
+   
   /**
    * Get all customers from the database
    *

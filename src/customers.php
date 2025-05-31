@@ -150,8 +150,10 @@ class Customers
         $errors = [];
 
         foreach ($required as $field) {
-            if (empty($data[$field])) {
+            if (!array_key_exists($field, $data)) {
                 $errors[] = "$field is required";
+            } elseif (is_string($data[$field]) && trim($data[$field]) === '') {
+                $errors[] = "$field cannot be empty";
             }
         }
 

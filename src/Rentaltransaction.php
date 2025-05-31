@@ -103,7 +103,14 @@ public function __construct(private RentaltransactionGatway $gatway){}
             return;
         }
         
-        $this->gatway->UpdateRentalTransaction($current, $new);
+    $rows = $this->gatway->UpdateRentalTransaction($current, $new);
+        if ($rows > 0) {
+            http_response_code(200);
+            echo json_encode(['message' => 'Rental transaction updated successfully']);
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => "could not updaed ID: {$current['TransactionID']}"]);
+        }
     }
 
     // deleteRentalTransaction

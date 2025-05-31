@@ -7,6 +7,7 @@ class RentaltransactionGatway
     public function __construct(Database $database)
     {
         $this->conn = $database->getConnection();
+        $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
   // add new rental transaction 
   public function AddRentalTransaction(array $data): int
@@ -14,22 +15,22 @@ class RentaltransactionGatway
       $sql = "INSERT INTO RentalTransaction (BookingID, UserID, PaymentDetails, PaidTotalDueAmount,
                                       ActualTotalDueAmount, TotalRemaining, TotalReturnGetAmount,
                                       TransactionDate, UpdatedTransactionDate) 
-              VALUES (:bookingId, :userId, :paymentDetails, :paidTotalDueAmount,
-                      :actualTotalDueAmount, :totalRemaining, :totalReturnGetAmount,
-                      :transactionDate, :updatedTransactionDate)";
+              VALUES (:BookingID, :UserID, :PaymentDetails, :PaidTotalDueAmount,
+                      :ActualTotalDueAmount, :TotalRemaining, :TotalReturnGetAmount,
+                      :TransactionDate, :UpdatedTransactionDate)";
 
       $transactionId = 0;
       try {
           $stmt = $this->conn->prepare($sql);
-          $stmt->bindParam(':bookingId', $data['BookingID']);
-          $stmt->bindParam(':userId', $data['UserID']);
-          $stmt->bindParam(':paymentDetails', $data['PaymentDetails']);
-          $stmt->bindParam(':paidTotalDueAmount', $data['PaidTotalDueAmount']);
-          $stmt->bindParam(':actualTotalDueAmount', $data['ActualTotalDueAmount']);
-          $stmt->bindParam(':totalRemaining', $data['TotalRemaining']);
-          $stmt->bindParam(':totalReturnGetAmount', $data['TotalReturnGetAmount']);
-          $stmt->bindParam(':transactionDate', $data['TransactionDate']);
-          $stmt->bindParam(':updatedTransactionDate', $data['UpdatedTransactionDate']);
+          $stmt->bindParam(':BookingID', $data['BookingID']);
+          $stmt->bindParam(':UserID', $data['UserID']);
+          $stmt->bindParam(':PaymentDetails', $data['PaymentDetails']);
+          $stmt->bindParam(':PaidTotalDueAmount', $data['PaidTotalDueAmount']);
+          $stmt->bindParam(':ActualTotalDueAmount', $data['ActualTotalDueAmount']);
+          $stmt->bindParam(':TotalRemaining', $data['TotalRemaining']);
+          $stmt->bindParam(':TotalReturnGetAmount', $data['TotalReturnGetAmount']);
+          $stmt->bindParam(':TransactionDate', $data['TransactionDate']);
+          $stmt->bindParam(':UpdatedTransactionDate', $data['UpdatedTransactionDate']);
 
           if ($stmt->execute()) {
               // here we return the last inserted ID
@@ -67,13 +68,13 @@ class RentaltransactionGatway
 
   } 
   // get rental transaction by ID
-  public function GetRentalTransactionById(int $id): array | bool
+  public function GetRentalTransactionById(int $TransactionID): array | bool
   {
       $IsFound = false;
       try {
-          $query = "SELECT * FROM RentalTransaction WHERE TransactionID = :id";
+          $query = "SELECT * FROM RentalTransaction WHERE TransactionID = :TransactionID";
           $stmt = $this->conn->prepare($query);
-          $stmt->bindParam(':id', $id);
+          $stmt->bindParam(':TransactionID', $TransactionID);
           $stmt->execute();
 
           if ($stmt->rowCount() > 0) {
@@ -92,41 +93,45 @@ class RentaltransactionGatway
       
   }
   // update rental transaction
-  public function UpdateRentalTransaction(array $data,array $current): int
-  {
-      $sql = "UPDATE RentalTransaction SET BookingID = :bookingId, UserID = :userId, PaymentDetails = :paymentDetails,
-              PaidTotalDueAmount = :paidTotalDueAmount, ActualTotalDueAmount = :actualTotalDueAmount,
-              TotalRemaining = :totalRemaining, TotalReturnGetAmount = :totalReturnGetAmount,
-              TransactionDate = :transactionDate, UpdatedTransactionDate = :updatedTransactionDate
-              WHERE TransactionID = :transactionId";
+  public function UpdateRentalTransaction(array $data, array $current): int
+ {
+    $sql = "UPDATE RentalTransaction SET 
+              BookingID = :BookingID, 
+              UserID = :UserID, 
+              PaymentDetails = :PaymentDetails,
+              PaidTotalDueAmount = :PaidTotalDueAmount, 
+              ActualTotalDueAmount = :ActualTotalDueAmount,
+              TotalRemaining = :TotalRemaining, 
+              TotalReturnGetAmount = :TotalReturnGetAmount,
+              TransactionDate = :TransactionDate, 
+              UpdatedTransactionDate = :UpdatedTransactionDate
+            WHERE TransactionID = :TransactionID";
 
-      $Effectedrows = 0;
-      try {
-          $stmt = $this->conn->prepare($sql);
-          $stmt->bindValue(':bookingId', $data['BookingID'] ?? $current['BookingID'] ,PDO::PARAM_INT);
-          $stmt->bindValue(':userId', $data['UserID'] ?? $current['UserID'],PDO::PARAM_INT);
-          $stmt->bindValue(':paymentDetails', $data['PaymentDetails'] ?? $current['PaymentDetails']);
-          $stmt->bindValue(':paidTotalDueAmount', $data['PaidTotalDueAmount'] ?? $current['PaidTotalDueAmount']);
-          $stmt->bindValue(':actualTotalDueAmount', $data['ActualTotalDueAmount'] ?? $current['ActualTotalDueAmount']);
-          $stmt->bindValue(':totalRemaining', $data['TotalRemaining'] ?? $current['TotalRemaining']);
-          $stmt->bindValue(':totalReturnGetAmount', $data['TotalReturnGetAmount'] ?? $current['TotalReturnGetAmount']);
-          $stmt->bindValue(':transactionDate', $data['TransactionDate'] ?? $current['TransactionDate']);
-          $stmt->bindValue(':updatedTransactionDate', $data['UpdatedTransactionDate'] ?? $current['UpdatedTransactionDate']);
-          $stmt->bindValue(':transactionId', $current['TransactionID'] ?? $data['TransactionID']);
-          $stmt->execute();
+    $Effectedrows = 0;
 
-          $Effectedrows = $stmt->rowCount();
-          
-      } catch (PDOException $e) {
-          echo "Error: " . $e->getMessage();
-          
-      }
-      finally
-      {
-          return $Effectedrows;
-      }
-      
-  }
+    try {
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':BookingID', $data['BookingID'] ?? $current['BookingID'], PDO::PARAM_INT);
+        $stmt->bindValue(':UserID', $data['UserID'] ?? $current['UserID'], PDO::PARAM_INT);
+        $stmt->bindValue(':PaymentDetails', $data['PaymentDetails'] ?? $current['PaymentDetails'], PDO::PARAM_STR);
+        $stmt->bindValue(':PaidTotalDueAmount', (string)$data['PaidTotalDueAmount'] ?? $current['PaidTotalDueAmount'], PDO::PARAM_STR);
+        $stmt->bindValue(':ActualTotalDueAmount', (string)$data['ActualTotalDueAmount'] ?? $current['ActualTotalDueAmount'], PDO::PARAM_STR);
+        $stmt->bindValue(':TotalRemaining', (string)$data['TotalRemaining'] ?? $current['TotalRemaining'], PDO::PARAM_STR);
+        $stmt->bindValue(':TotalReturnGetAmount', (string)$data['TotalReturnGetAmount'] ?? $current['TotalReturnGetAmount'], PDO::PARAM_STR);
+        $stmt->bindValue(':TransactionDate', $data['TransactionDate'] ?? $current['TransactionDate'], PDO::PARAM_STR);
+        $stmt->bindValue(':UpdatedTransactionDate', $data['UpdatedTransactionDate'] ?? $current['UpdatedTransactionDate'], PDO::PARAM_STR);
+        $stmt->bindValue(':TransactionID', $data['TransactionID'] ?? $current['TransactionID'], PDO::PARAM_INT);
+
+        $stmt->execute();
+        $Effectedrows = $stmt->rowCount();
+
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    } finally {
+        return $Effectedrows;
+    }
+}
+
   // delete rental transaction
   public function deleteRentalTransaction(int $id): int
   {
