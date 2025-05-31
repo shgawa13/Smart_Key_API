@@ -111,7 +111,7 @@ class Vehicles
           return;
       }
 
-      if (!$current) {                       // row really is missing
+      if (!$current) {                      
         http_response_code(404);
         echo json_encode(['error' => "Customer not found with ID: {$current['CustomerID']}"]);
         return;

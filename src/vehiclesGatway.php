@@ -73,7 +73,7 @@ class VehiclesGatway
   {
     $data = [];
     try{
-      $query = "SELECT * FROM Vehicle ORDER BY VehicleID ASC";
+      $query = "SELECT * FROM vehiclesview ORDER BY VehicleID ASC";
       $stmt = $this->conn->prepare($query);
       $stmt->execute();
 
@@ -93,51 +93,47 @@ class VehiclesGatway
   }
   
   public function updateVehicle(array $current, array $data): int
-  {
+{
     $query = "UPDATE Vehicle SET Make = :Make, Model = :Model, Year = :Year, Mileage = :Mileage,
     FuelTypeID = :FuelTypeID, PlateNumber = :PlateNumber, CarCategoryID = :CarCategoryID,
     RentalPricePerDay = :RentalPricePerDay, IsAvailableForRent = :IsAvailableForRent, CarImage = :CarImage
     WHERE VehicleID = :id";
 
-      $rowsEffected = 0;
+    $rowsEffected = 0;
 
-    try{
+    try {
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':Make', $data['Make'] ?? $current['Make'],
-        PDO::PARAM_STR);
-        $stmt->bindValue(':Model', $data['Model'] ?? $current['Model'],
-        PDO::PARAM_STR);
-        $stmt->bindValue(':Year', $data['Year'] ?? $current['Year'],
-        PDO::PARAM_INT);
-        $stmt->bindValue(':Mileage', $data['Mileage'] ?? $current['Mileage'],
-        PDO::PARAM_INT);
-        $stmt->bindValue(':FuelTypeID', $data['FuelTypeID'] ?? $current['FuelTypeID'],
-        PDO::PARAM_INT);
-        $stmt->bindValue(':PlateNumber', $data['PlateNumber'] ?? $current['PlateNumber'],
-        PDO::PARAM_STR);
-        $stmt->bindValue(':CarCategoryID', $data['CarCategoryID'] ?? $current['CarCategoryID'],
-        PDO::PARAM_INT);
-        $stmt->bindValue(':RentalPricePerDay', $data['RentalPricePerDay'] ?? $current['RentalPricePerDay'], 
-          PDO::PARAM_INT);
-          $IsAvailableForRent = isset($new['IsAvailableForRent']) ? filter_var($new['IsAvailableForRent'],
-           FILTER_VALIDATE_BOOLEAN) : (bool)$current['Gender'];
-      $stmt->bindValue(':Gender', $IsAvailableForRent, PDO::PARAM_INT);
-        $stmt->bindValue(':CarImage', $data['CarImage'] ?? $current['CarImage'],
-        PDO::PARAM_STR);
+        $stmt->bindValue(':Make', $data['Make'] ?? $current['Make'], PDO::PARAM_STR);
+        $stmt->bindValue(':Model', $data['Model'] ?? $current['Model'], PDO::PARAM_STR);
+        $stmt->bindValue(':Year', $data['Year'] ?? $current['Year'], PDO::PARAM_INT);
+        $stmt->bindValue(':Mileage', $data['Mileage'] ?? $current['Mileage'], PDO::PARAM_INT);
+        $stmt->bindValue(':FuelTypeID', $data['FuelTypeID'] ?? $current['FuelTypeID'], PDO::PARAM_INT);
+        $stmt->bindValue(':PlateNumber', $data['PlateNumber'] ?? $current['PlateNumber'], PDO::PARAM_STR);
+        $stmt->bindValue(':CarCategoryID', $data['CarCategoryID'] ?? $current['CarCategoryID'], PDO::PARAM_INT);
+        
+        // Corrected RentalPricePerDay handling
+        $stmt->bindValue(':RentalPricePerDay', $data['RentalPricePerDay'] ?? $current['RentalPricePerDay'], PDO::PARAM_STR);
+        
+        // Corrected IsAvailableForRent handling
+        $isAvailable = isset($data['IsAvailableForRent']) 
+            ? filter_var($data['IsAvailableForRent'], FILTER_VALIDATE_BOOLEAN) 
+            : (bool)($current['IsAvailableForRent'] ?? true);
+        $stmt->bindValue(':IsAvailableForRent', (int)$isAvailable, PDO::PARAM_INT);
+        
+        $stmt->bindValue(':CarImage', $data['CarImage'] ?? $current['CarImage'], PDO::PARAM_STR);
         $stmt->bindValue(':id', $current['VehicleID'], PDO::PARAM_INT);
-        $rowsEffected= $stmt->execute();
+        
+        $stmt->execute();
+        $rowsEffected = $stmt->rowCount();  // Get actual affected rows count
 
-    }catch(PDOException $e) {
-      // Handle the exception
-      http_response_code(500);
-      // Log the error message  
-     json_decode("Error: " . $e->getMessage());
-    }
-    finally{
-      return $rowsEffected;
+    } catch(PDOException $e) {
+        http_response_code(500);
+        error_log("Error updating vehicle: " . $e->getMessage());
+        return 0;
     }
 
-  } 
+    return $rowsEffected;
+}
 
   public function deleteVehicle(string $id): bool
   { 

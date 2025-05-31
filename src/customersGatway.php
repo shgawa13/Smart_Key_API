@@ -32,8 +32,6 @@ class CustomersGatway
    public function addNew(array $data): int
    {
        $NewId = 0;
-
-       var_dump($data['Gender']);
    
        try {
            $query = "INSERT INTO customer(FirstName, SecondName, LastName, DateOfBirth, Gender, PhoneNumber, DriverLicenseNumber)
