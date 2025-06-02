@@ -155,9 +155,10 @@ class Vehicles
 
 
       foreach ($required as $field) {
-        if (empty($data[$field])) {
+        if (!isset($data[$field]) || $data[$field] === '') {
             $errors[$field] = "$field is required";
         }
+    
 
       
     }

@@ -101,14 +101,37 @@ switch ($endpoint) {
         break;
 
     case 'rentaltransaction':
-        RentalTransactionProcess($database,$parts);
+        RentalTransactionProcess($database,$parts,$endpoint);
         break;
 
+    
+    case 'login':
+        LoginProcess($database,$parts,$endpoint);
+        break;
+
+    case 'register':
+        RegisterProcess($database,$parts,$endpoint);
+        break;
     default:
         http_response_code(404);
         echo json_encode(['error' => 'Invalid endpoint']);
         exit;
 }   
+
+function LoginProcess($database,$parts,$endpoint)
+{
+    $gatway = new UsersGatway($database);
+    $Users = new Users($gatway);
+    $Users->processLoginRequest($_SERVER["REQUEST_METHOD"], $parts[5]);
+    
+    
+}
+
+function RegisterProcess($database,$parts,$endpoint){
+    var_dump($parts[5]);
+    var_dump($endpoint);
+    var_dump($_SERVER["REQUEST_METHOD"]);
+}
 
 
 function CustomersProcess($database,$parts){

@@ -11,6 +11,7 @@ class VehiclesGatway
 
   public function addNew(array $data): int
   {
+    
     $NewId = 0;
 
     try{
