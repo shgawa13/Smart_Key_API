@@ -10,35 +10,52 @@ class UsersGatway
   }
 
   
-    public function addNew(array $data): int
-    {
-        $newId = 0;
-        var_dump($data);
-        try {
-            $query = "INSERT INTO users (UserName, Password, Email,IsAdmin) 
-            VALUES (:UserName, :Password,:Email, :IsAdmin)";
-            $stmt = $this->conn->prepare($query);
-
-            $stmt->bindParam(':UserName', $data['UserName']);
-            $stmt->bindParam(':Password', $data['Password']);
-            $stmt->bindParam(':Email', $data['Email']);
-            // If the user is an admin, set IsAdmin to true, otherwise false
-            $stmt->bindParam(':IsAdmin', $data['IsAdmin']);
-            $stmt->execute();
-
-            // Return the last inserted ID
-            $newId = (int)$this->conn->lastInsertId();
-            var_dump($newId);
-        } catch (PDOException $e) {
-           
-           http_response_code(500);
-          // Log the error message  
-          json_decode("Error: " . $e->getMessage());
-          $newId = 0;
-        }
-
-        return $newId;
-    }
+  public function addNew(array $data): int
+  {
+      try {
+          // Check if the username exists
+          $query = "SELECT COUNT(*) FROM users WHERE UserName = :UserName";
+          $stmt = $this->conn->prepare($query);
+          $stmt->bindParam(':UserName', $data['UserName']);
+          $stmt->execute();
+          $usernameExists = $stmt->fetchColumn() > 0;
+  
+          if ($usernameExists) {
+              http_response_code(409); // Conflict
+              echo json_encode(["error" => "UserName Already Exist"]);
+              return 0;
+          }
+  
+          // Check if the email exists
+          $query = "SELECT COUNT(*) FROM users WHERE Email = :Email";
+          $stmt = $this->conn->prepare($query);
+          $stmt->bindParam(':Email', $data['Email']);
+          $stmt->execute();
+          $emailExists = $stmt->fetchColumn() > 0;
+  
+          if ($emailExists) {
+              http_response_code(409); // Conflict
+              echo json_encode(["error" => "Email Already Exist"]);
+              return 0;
+          }
+  
+          // Insert the new user
+          $query = "INSERT INTO users (UserName, Password, Email, IsAdmin) VALUES (:UserName, :Password, :Email, :IsAdmin)";
+          $stmt = $this->conn->prepare($query);
+          $stmt->bindParam(':UserName', $data['UserName']);
+          $stmt->bindParam(':Password', $data['Password']);
+          $stmt->bindParam(':Email', $data['Email']);
+          $stmt->bindParam(':IsAdmin', $data['IsAdmin']);
+          $stmt->execute();
+  
+          return (int)$this->conn->lastInsertId();
+      } catch (PDOException $e) {
+          http_response_code(500);
+          echo json_encode(["error" => $e->getMessage()]);
+          return 0;
+      }
+  }
+  
       
 
     public function getById(int $id): array | bool
